@@ -9,8 +9,8 @@ class City:
         self.lat = lat
         self.lon = lng
 
-    #   def __repr__(self):
-    # return f"City({self.name}, {self.lat},{self.lon})"
+    def __repr__(self):
+        return f"{self.name}, {self.lat},{self.lon}"
 
 
 # We have a collection of US cities with population over 750,000 stored in the
@@ -37,16 +37,17 @@ def cityreader(cities=[]):
         citydata = csv.reader(file, delimiter=",")
         citydata = list(citydata)[1:]
         for row in citydata:
-            cities.append(City(row[0], float(row[3]), float(row[4])))
+            cities.append(City(str(row[0]), float(row[3]), float(row[4])))
 
     return cities
 
 
-cityreader(cities)
+cities = cityreader(cities)
 
 # Print the list of cities (name, lat, lon), 1 record per line.
 for c in cities:
-    print('"{}", {},{}'.format(c.name, c.lat, c.lon))
+    # print(c)
+    pass
 
 # STRETCH GOAL!
 #
@@ -83,9 +84,39 @@ for c in cities:
 def cityreader_stretch(lat1, lon1, lat2, lon2, cities=[]):
     # within will hold the cities that fall within the specified region
     within = []
-
     # TODO Ensure that the lat and lon valuse are all floats
     # Go through each city and check to see if it falls within
     # the specified coordinates.
+    latsort = sorted([lat1, lat2])
+    lonsort = sorted([lon1, lon2], reverse=True)
 
+    def lattest(x):
+        return x.lat > latsort[0] and x.lat < latsort[1]
+
+    def lontest(x):
+        return x.lon < lonsort[0] and x.lon > lonsort[1]
+
+    within = [c for c in cities if lattest(c) and lontest(c)]
     return within
+
+
+while True:
+    try:
+        x, y = [float(x) for x in input("enter lat and lon:").split(",")]
+        cords = sorted([x, y], reverse=True)
+        cords = tuple(cords)
+        try:
+            x1, y1 = [float(x1) for x1 in input("enter lat and lon:").split(",")]
+            cords1 = sorted([x1, y1], reverse=True)
+            cords1 = tuple(cords1)
+            cords3 = cords + cords1
+            lat1, lon1, lat2, lon2 = cords3
+            results = cityreader_stretch(*cords3, cities=cities)
+            print(results)
+            print()
+            break
+        except ValueError:
+            print("error! not valid lat long coors")
+        break
+    except ValueError:
+        print("error! not valid lat long coors")
